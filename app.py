@@ -1,34 +1,43 @@
 from logic import add, view, search, delete
 import sys
+import os
+import json
+
+BASE_DIR = os.path.dirname(__file__)
+DATA_FILE = os.path.join(BASE_DIR, "data.json")
+
+try:
+    with open(DATA_FILE) as file:
+        information = json.load(file)
+except FileNotFoundError:
+    with open(DATA_FILE, "x") as file:
+        json.dump({}, file)
+    with open(DATA_FILE) as file:
+        information = json.load(file)
 
 if len(sys.argv) == 1:
     sys.exit("Use the commands 'add' 'view' 'search' 'delete' to use program")
 
 if sys.argv[1] == "add":
-    title = input("title: ").strip().lower()
-    content = input("Content: ").strip()
     tag = input("Tag: ").strip().lower()
+    title = input("Title: ").strip().lower()
+    content = input("Content: ").strip()
 
-    if not add(title, content, tag):
-        print("Please input title, content and tag of note")
+    print(add(tag, title, content, information))
 
 elif sys.argv[1] == "view":
-    if not view():
-        print("No results")
+    view(information)
 
 elif sys.argv[1] == "search":
-    if len(sys.argv) == 4:
-        if not search(sys.argv[2].lower(), sys.argv[3].lower()):
-            print("No results")
-    else:
-        print("Please input note (title) + (tag)")
+    tag = input("Tag: ").lower().strip()
+    title = input("Title: ").lower().strip()
+
+    print(search(tag, title, information))
 
 elif sys.argv[1] == "delete":
-    if len(sys.argv) == 4:
-        if not delete(sys.argv[2], sys.argv[3]):
-            print("Invalid tag or title")
-    else:
-        print("Please input note (title) + (tag)")
+    tag = input("Tag: ").lower().strip()
+    title = input("Title: ").lower().strip()
+    print(delete(information, tag, title))
 
 else:
     print("Invalid input")

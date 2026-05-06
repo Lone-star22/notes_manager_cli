@@ -1,133 +1,93 @@
 import json
-try:
-    with open("level_1/knowledge_tracker/data.json") as file:
-        information = json.load(file)
-except FileNotFoundError:
-    with open("level_1/knowledge_tracker/data.json", "x") as file:
-        json.dump({}, file)
-    with open("level_1/knowledge_tracker/data.json") as file:
-        information = json.load(file)
+import os
 
-def add(title, content, tag):
+BASE_DIR = os.path.dirname(__file__)
+DATA_FILE = os.path.join(BASE_DIR, "data.json")
+
+def add(tag, title, content, information):
     #Check if the all arguments have values
     if not title or not content or not tag:
-        return False
+        return "Please input title, content and tag of note"
     
     #creation of the needed timestamp
     from datetime import datetime as dt
-    timestamp = dt.now().strftime("%H:%M:%S")
+    timestamp = dt.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    collection = information.get(tag, [])
-
-    #Update specified note if the note exists
-    found_title = False
-    for i in collection:
-        info = i.get(title, False)
-        if not info:
-            continue
-        new_info = f"{info[0]}. {content}"
-        i[title][0] = new_info
-        i[title][1] = timestamp
-        found_title = True
-        break
+    #Add note if it doesn't exist else update the existing one
+    the_tag = information.get(tag, {})
+    note = the_tag.get(title, {})
+    if not note:
+        the_tag[title] = {"content": content, "date": timestamp}
+    else:
+        note["content"] = f"{note["content"]}. {content}"
+        note["date"] = timestamp
+    information[tag] = the_tag
     
-    #Add specified note if the note doesn't exist yet
-    if not found_title:
-        collection.append({title: [content, timestamp]})
-    
-    information[tag] = collection
-
     #Writing back to the json file after the above changes
-    with open("level_1/knowledge_tracker/data.json", "w") as file:
+    with open(DATA_FILE, "w") as file:
         json.dump(information, file, indent=4)
-        print("Note successfully added")
-        return True
+        return "Note successfully added"
 
 
-def view():
+def view(information):
     #Check if data file exists
     if not information:
-        return False
+        print("No results")
+        return
     
     #Print the name of the tags alongside all notes associated with them
     for tag in information:
-        tags = information.get(tag)
         print(f"Tag: {tag.upper()}\nNotes:")
-        title_names = get_title(tags)
-        for i in sorted(title_names):
-            print(f"     {i.title()}")
-    return True
+        for title in information[tag]:
+            print(f"     {title.title()}")
     
 
-def search(title, tag):
+def search(tag, title, information):
     #Check if data file exists
     if not information:
-        return False
+        return "No notes to search"
+    if not title or not tag:
+        return "Please input note 'title' and 'tag'"
     
-    #If tag name isn't correct handle the output for a correct/incorrect title
-    collection = information.get(tag)
-    if not collection:
-        found_title = False
-        for t in information:
-            tags = information.get(t)
-            title_names = get_title(tags)
-            if title in title_names:
-                print(f"Tag: {t.title()} -- Note: {title.title()}")
-                found_title = True
-        if not found_title:
-            return False
-        return True
-    
-    #If tag name is correct handle the output for a correct/incorrect title 
-    for note in collection:
-        note_content = note.get(title)
-        if not note_content:
-            continue
-        print(f"Title: {title.title()}    Time Created: {note_content[1]}\n\nContent: \n{note_content[0]}")
-        return True
-    
-    title_names = get_title(collection)
-    print(f"Tag: {tag.title()}\nNotes: ")
-    for i in title_names:
-        print(f"      {i.title()}") 
-    return True 
+    #Handle output for user's search
+    the_tag = information.get(tag, {})
+    if not the_tag:
+        return "Invalid tag"
+    note = the_tag.get(title, {})
+    if not note:
+        return "Invalid title"
+    return f"Tag: {tag.title()}    Title: {title.title()}    Date Created: {note["date"]}\n\nContent: \n{note["content"]}"
 
 
-def delete(title, tag):
+def delete(information, tag=None, title=None):
     #Check if data file exists
     if not information:
-        return False
+        return "No notes to delete"
     
-    #Check if the tag and title of the note are correct
-    collection = information.get(tag)
-    if not collection:
-        return False
-    title_names = get_title(collection)    
-    if title not in title_names:
-        return False
-    
-    #Remove the specified note
-    for i in collection:
-        note = i.pop(title, None)
-        if note:
-            collection.remove(i)
-            break
-    
-    #Remove tag if it isn't attached to any note again
-    information[tag] = collection
-    if not collection:
-        information.pop(tag)
+    #Handle user inputs for tag OR title
+    if not title and not tag:
+        return "Please input note 'title' or/and 'tag'"
+    if not tag:
+        for tags in information:
+            popped = information[tags].pop(title, None)
+            if not popped:
+                return "Invalid title"
+    if not title:
+        popped = information.pop(tag, None)
+        if not popped:
+            return "Invalid tag"
+
+    #Handle user input for tag AND title
+    if title and tag:
+        the_tag = information.get(tag, {})
+        if not the_tag:
+            return "Invalid tag"
+        note = the_tag.get(title, {})
+        if not note:
+            return "Invalid title"
+        information[tag].pop(title)
 
     #Write back to the json file after the above changes
-    with open("level_1/knowledge_tracker/data.json", "w") as file:
+    with open(DATA_FILE, "w") as file:
         json.dump(information, file, indent=4)
-    print("Note successfully deleted")
-    return True
-
-
-def get_title(tag_list):
-    title_names = []
-    for notes in tag_list:
-        for title in notes:
-            title_names.append(title)
-    return title_names
+    return "Successfully deleted"
