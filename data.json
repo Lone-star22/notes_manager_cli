@@ -1,14 +1,22 @@
 {
-    "science": {
-        "chemistry": {
-            "content": "The study of the chemical properties of nature",
-            "date": "2026-05-06 06:49:02"
+    "engineering": {
+        "civil": {
+            "content": "something like this",
+            "date": "2026-05-06 17:07:28"
+        },
+        "electrical": {
+            "content": "something just like it",
+            "date": "2026-05-06 17:07:45"
+        },
+        "chemical": {
+            "content": "This is a test",
+            "date": "2026-05-06 17:08:04"
         }
     },
-    "engineering": {
-        "physics": {
-            "content": "This is different from the other tagged physics",
-            "date": "2026-05-06 14:44:58"
+    "technology": {
+        "machine learnig": {
+            "content": "study of intellingent systems",
+            "date": "2026-05-06 17:08:31"
         }
     }
 }

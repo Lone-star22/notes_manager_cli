@@ -2,7 +2,7 @@ import json
 import os
 
 BASE_DIR = os.path.dirname(__file__)
-DATA_FILE = os.path.join(BASE_DIR, "data.json")
+JSON_FILE = os.path.join(BASE_DIR, "data.json")
 
 def add(tag, title, content, information):
     #Check if the all arguments have values
@@ -19,12 +19,12 @@ def add(tag, title, content, information):
     if not note:
         the_tag[title] = {"content": content, "date": timestamp}
     else:
-        note["content"] = f"{note["content"]}. {content}"
+        note["content"] = f"{note['content']}. {content}"
         note["date"] = timestamp
     information[tag] = the_tag
     
     #Writing back to the json file after the above changes
-    with open(DATA_FILE, "w") as file:
+    with open(JSON_FILE, "w") as file:
         json.dump(information, file, indent=4)
         return "Note successfully added"
 
@@ -36,10 +36,16 @@ def view(information):
         return
     
     #Print the name of the tags alongside all notes associated with them
+    max_count, max_tag = 0, None
     for tag in information:
         print(f"Tag: {tag.upper()}\nNotes:")
-        for title in information[tag]:
+        if len(information[tag]) > max_count:
+            max_count = len(information[tag])
+            max_tag = tag
+        for title in sorted(information[tag]):
             print(f"     {title.title()}")
+    
+    print(f"Most Used Tag: {max_tag.title()} -- Number Of Times: {max_count}")
     
 
 def search(tag, title, information):
@@ -88,6 +94,25 @@ def delete(information, tag=None, title=None):
         information[tag].pop(title)
 
     #Write back to the json file after the above changes
-    with open(DATA_FILE, "w") as file:
+    with open(JSON_FILE, "w") as file:
         json.dump(information, file, indent=4)
     return "Successfully deleted"
+
+def edit_tag(old_tag, new_tag, information):
+    #Check if information, old and new tag exits
+    if not information:
+        return "No tags to edit"
+    if not old_tag or not new_tag:
+        return "Please input 'old tag' and 'new tag'" 
+    
+    #Handle user input for tag to be updated
+    the_tag = information.get(old_tag, {})
+    if not the_tag:
+        return "Invalid tag"
+    information.pop(old_tag)
+    information.setdefault(new_tag, the_tag)
+
+    #Write back to the json file after above changes
+    with open(JSON_FILE, "w") as file:
+        json.dump(information, file, indent=4)
+    return "Tag edited successfully"
