@@ -1,8 +1,4 @@
-import json
-import os
-
-BASE_DIR = os.path.dirname(__file__)
-JSON_FILE = os.path.join(BASE_DIR, "data.json")
+from storage import save
 
 def add(tag, title, content, information):
     #Check if the all arguments have values
@@ -24,10 +20,8 @@ def add(tag, title, content, information):
     information[tag] = the_tag
     
     #Writing back to the json file after the above changes
-    with open(JSON_FILE, "w") as file:
-        json.dump(information, file, indent=4)
-        return "Note successfully added"
-
+    save(information)
+    return "Note added succesfully"
 
 def view(information):
     #Check if data file exists
@@ -74,10 +68,13 @@ def delete(information, tag=None, title=None):
     if not title and not tag:
         return "Please input note 'title' or/and 'tag'"
     if not tag:
+        found_title = False
         for tags in information:
             popped = information[tags].pop(title, None)
-            if not popped:
-                return "Invalid title"
+            if popped:
+                found_title = True
+        if not found_title:
+            return "Invalid title"
     if not title:
         popped = information.pop(tag, None)
         if not popped:
@@ -94,8 +91,7 @@ def delete(information, tag=None, title=None):
         information[tag].pop(title)
 
     #Write back to the json file after the above changes
-    with open(JSON_FILE, "w") as file:
-        json.dump(information, file, indent=4)
+    save(information)
     return "Successfully deleted"
 
 def edit_tag(old_tag, new_tag, information):
@@ -113,6 +109,5 @@ def edit_tag(old_tag, new_tag, information):
     information.setdefault(new_tag, the_tag)
 
     #Write back to the json file after above changes
-    with open(JSON_FILE, "w") as file:
-        json.dump(information, file, indent=4)
+    save(information)
     return "Tag edited successfully"

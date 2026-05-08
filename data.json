@@ -1,22 +1,18 @@
 {
-    "engineering": {
-        "civil": {
-            "content": "something like this",
-            "date": "2026-05-06 17:07:28"
+    "arts": {
+        "painting": {
+            "content": "The act of representing real world events in a drawn picture",
+            "date": "2026-05-08 02:51:44"
         },
-        "electrical": {
-            "content": "something just like it",
-            "date": "2026-05-06 17:07:45"
-        },
-        "chemical": {
-            "content": "This is a test",
-            "date": "2026-05-06 17:08:04"
+        "pottery": {
+            "content": "The discipline that deals with making objects from clay or similar stuff",
+            "date": "2026-05-08 02:52:39"
         }
     },
     "technology": {
-        "machine learnig": {
-            "content": "study of intellingent systems",
-            "date": "2026-05-06 17:08:31"
+        "machine learning": {
+            "content": "The discipline which involves making smart artificial systems",
+            "date": "2026-05-08 02:53:31"
         }
     }
 }
