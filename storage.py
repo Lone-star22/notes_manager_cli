@@ -14,24 +14,25 @@ if not os.path.exists(TEXT_FILE):
     with open(TEXT_FILE, "x") as file:
         ...
 
-def load(history=False):
+def load(history=False, load_notes=True):
     if history:
         with open(TEXT_FILE) as file:
             for line in file:
                 print(line.rstrip())
-        return
-
-    with open(JSON_FILE) as file:
-        information = json.load(file)
-        return information
+    
+    if load_notes:
+        with open(JSON_FILE) as file:
+            information = json.load(file)
+            return information
     
 
 def save(information=None, command=None):
-    if information:
-        with open(JSON_FILE, "w") as file:
-            json.dump(information, file, indent=4)
-    
-    if command:
+    if command != None:
         with open(TEXT_FILE, "a") as file:
             file.write(f"Command: {command} -- Time: {dt.now().strftime("%Y-%m-%d %H:%M:%S")}\n")
+        
+    if information != None:
+        with open(JSON_FILE, "w") as file:
+            json.dump(information, file, indent=4)
+
     

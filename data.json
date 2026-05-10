@@ -1,18 +1,8 @@
 {
-    "arts": {
-        "painting": {
-            "content": "The act of representing real world events in a drawn picture",
-            "date": "2026-05-08 02:51:44"
-        },
-        "pottery": {
-            "content": "The discipline that deals with making objects from clay or similar stuff",
-            "date": "2026-05-08 02:52:39"
-        }
-    },
-    "technology": {
-        "machine learning": {
-            "content": "The discipline which involves making smart artificial systems",
-            "date": "2026-05-08 02:53:31"
+    "it": {
+        "asml": {
+            "content": "This is a connection of networks",
+            "date": "2026-05-09 20:50:08"
         }
     }
 }

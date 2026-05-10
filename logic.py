@@ -1,113 +1,95 @@
+from datetime import datetime as dt
 from storage import save
 
-def add(tag, title, content, information):
-    #Check if the all arguments have values
-    if not title or not content or not tag:
-        return "Please input title, content and tag of note"
-    
-    #creation of the needed timestamp
-    from datetime import datetime as dt
-    timestamp = dt.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    #Add note if it doesn't exist else update the existing one
-    the_tag = information.get(tag, {})
-    note = the_tag.get(title, {})
-    if not note:
-        the_tag[title] = {"content": content, "date": timestamp}
-    else:
-        note["content"] = f"{note['content']}. {content}"
-        note["date"] = timestamp
-    information[tag] = the_tag
-    
-    #Writing back to the json file after the above changes
-    save(information)
-    return "Note added succesfully"
 
-def view(information):
-    #Check if data file exists
-    if not information:
-        print("No results")
-        return
+class Note: 
+    def __init__(self, tag=None, title=None, content=None):
+        self.tag = tag
+        self.title = title
+        self.content = content
     
-    #Print the name of the tags alongside all notes associated with them
-    max_count, max_tag = 0, None
-    for tag in information:
-        print(f"Tag: {tag.upper()}\nNotes:")
-        if len(information[tag]) > max_count:
-            max_count = len(information[tag])
-            max_tag = tag
-        for title in sorted(information[tag]):
-            print(f"     {title.title()}")
+    def add(self, information):
+        #creation of the needed timestamp
+        timestamp = dt.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        #Add note if it doesn't exist else update the existing one
+        the_tag = information.get(self.tag, {})
+        note = the_tag.get(self.title, {})
+        if not note:
+            the_tag[self.title] = {"content": self.content, "date": timestamp}
+        else:
+            note["content"] = f"{note['content']}. {self.content}"
+            note["date"] = timestamp
+        information[self.tag] = the_tag
+        
+        #Writing back to the json file after the above changes
+        save(information)
+        return "Note added succesfully"
     
-    print(f"Most Used Tag: {max_tag.title()} -- Number Of Times: {max_count}")
-    
-
-def search(tag, title, information):
-    #Check if data file exists
-    if not information:
-        return "No notes to search"
-    if not title or not tag:
-        return "Please input note 'title' and 'tag'"
-    
-    #Handle output for user's search
-    the_tag = information.get(tag, {})
-    if not the_tag:
-        return "Invalid tag"
-    note = the_tag.get(title, {})
-    if not note:
-        return "Invalid title"
-    return f"Tag: {tag.title()}    Title: {title.title()}    Date Created: {note["date"]}\n\nContent: \n{note["content"]}"
-
-
-def delete(information, tag=None, title=None):
-    #Check if data file exists
-    if not information:
-        return "No notes to delete"
-    
-    #Handle user inputs for tag OR title
-    if not title and not tag:
-        return "Please input note 'title' or/and 'tag'"
-    if not tag:
-        found_title = False
-        for tags in information:
-            popped = information[tags].pop(title, None)
-            if popped:
-                found_title = True
-        if not found_title:
-            return "Invalid title"
-    if not title:
-        popped = information.pop(tag, None)
-        if not popped:
-            return "Invalid tag"
-
-    #Handle user input for tag AND title
-    if title and tag:
-        the_tag = information.get(tag, {})
+    def search(self, information):
+        #Check if data file exists
+        if not information:
+            return "No notes to search"
+        
+        #Handle output for user's search
+        the_tag = information.get(self.tag, {})
         if not the_tag:
             return "Invalid tag"
-        note = the_tag.get(title, {})
+        note = the_tag.get(self.title, {})
         if not note:
             return "Invalid title"
-        information[tag].pop(title)
-
-    #Write back to the json file after the above changes
-    save(information)
-    return "Successfully deleted"
-
-def edit_tag(old_tag, new_tag, information):
-    #Check if information, old and new tag exits
-    if not information:
-        return "No tags to edit"
-    if not old_tag or not new_tag:
-        return "Please input 'old tag' and 'new tag'" 
+        return f"Tag: {self.tag.title()}    Title: {self.title.title()}    Date Created: {note["date"]}\n\nContent: \n{note["content"]}"
     
-    #Handle user input for tag to be updated
-    the_tag = information.get(old_tag, {})
-    if not the_tag:
-        return "Invalid tag"
-    information.pop(old_tag)
-    information.setdefault(new_tag, the_tag)
+    def delete(self, information):
+        #Check if data file exists
+        if not information:
+            return "No notes to delete"    
 
-    #Write back to the json file after above changes
-    save(information)
-    return "Tag edited successfully"
+        #Handle user input
+        the_tag = information.get(self.tag, {})
+        if not the_tag:
+            return "Invalid tag"
+        note = the_tag.get(self.title, {})
+        if not note:
+            return "Invalid title"
+        information[self.tag].pop(self.title)
+        if not information[self.tag]:
+            information.pop(self.tag)
+
+
+        #Write back to the json file after the above changes
+        save(information)
+        return "Successfully deleted"
+
+    def view(self, information):
+        #Check if data file exists
+        if not information:
+            print("No results")
+            return
+        
+        #Print the name of the tags alongside all notes associated with them
+        max_count, max_tag = 0, None
+        for tag in information:
+            print(f"Tag: {tag.upper()}\nNotes:")
+            if len(information[tag]) > max_count:
+                max_count = len(information[tag])
+                max_tag = tag
+            for title in sorted(information[tag]):
+                print(f"     {title.title()}")
+        print(f"Most Used Tag: {max_tag.title()} -- Number of Times: {max_count}") 
+    
+    def edit_tag(self, information, new_tag):
+        #Check if information, current tag and new tag exists
+        if not information:
+            return "No tags to edit"
+        
+        #Change the name of the current tag to that of new tag
+        the_tag = information.get(self.tag, {})
+        if not the_tag:
+            return "Invalid tag"
+        information.pop(self.tag)
+        information.setdefault(new_tag, the_tag)
+
+        #Write back to the json file after above changes
+        save(information)
+        return "Tag edited successfully"
