@@ -27,7 +27,6 @@ class Note:
         return "Note added succesfully"
     
     def search(self, information):
-        #Check if data file exists
         if not information:
             return "No notes to search"
         
@@ -41,10 +40,9 @@ class Note:
         return f"Tag: {self.tag.title()}    Title: {self.title.title()}    Date Created: {note["date"]}\n\nContent: \n{note["content"]}"
     
     def delete(self, information):
-        #Check if data file exists
         if not information:
-            return "No notes to delete"    
-
+            return "No notes to delete"
+        
         #Handle user input
         the_tag = information.get(self.tag, {})
         if not the_tag:
@@ -62,9 +60,8 @@ class Note:
         return "Successfully deleted"
 
     def view(self, information):
-        #Check if data file exists
         if not information:
-            print("No results")
+            print("No notes to view")
             return
         
         #Print the name of the tags alongside all notes associated with them
@@ -79,9 +76,8 @@ class Note:
         print(f"Most Used Tag: {max_tag.title()} -- Number of Times: {max_count}") 
     
     def edit_tag(self, information, new_tag):
-        #Check if information, current tag and new tag exists
         if not information:
-            return "No tags to edit"
+            return "No notes to edit"
         
         #Change the name of the current tag to that of new tag
         the_tag = information.get(self.tag, {})
