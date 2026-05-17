@@ -27,11 +27,11 @@ def load(history=False, load_notes=True):
     
 
 def save(information=None, command=None):
-    if command != None:
+    if command is not None:
         with open(TEXT_FILE, "a") as file:
-            file.write(f"Command: {command} -- Time: {dt.now().strftime("%Y-%m-%d %H:%M:%S")}\n")
+            file.write(f"Command: {command} -- Time: {dt.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         
-    if information != None:
+    if information is not None:
         with open(JSON_FILE, "w") as file:
             json.dump(information, file, indent=4)
 

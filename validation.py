@@ -1,24 +1,23 @@
-def validation(tag=False, title=False, new_tag=False, information=False):
+def validation(tag=None, title=None, new_tag=None, information=None):
     if tag:
-        if len(tag) > 15:
+        if len(tag) > 20:
             return False
     if title:
-        if len(title) > 15:
+        if len(title) > 20:
             return False  
     if new_tag:
-        if len(new_tag) > 15:
+        if len(new_tag) > 20:
             return False
-    if information != False:
-        if type(information) != dict:
+    if information is not None:
+        if not isinstance(information, dict):
             return False
         for tags in information:
-            if type(information[tags]) != dict:
+            if not isinstance(information[tags], dict):
                 return False
             for titles in information[tags]:
-                if type(information[tags][titles]) != dict:
+                if not isinstance(information[tags][titles], dict):
                     return False   
-                if len(information[tags][titles]) != 2:
-                    return False
-                if "content" not in information[tags][titles].keys() or "date" not in information[tags][titles].keys():
+                required = {"content", "date"}
+                if not required.issubset(information[tags][titles].keys()):
                     return False
     return True

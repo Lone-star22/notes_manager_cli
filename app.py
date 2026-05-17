@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from logic import Note
+from logic import Note, NotesManager
 from storage import load, save
 from validation import validation
 
@@ -28,8 +28,11 @@ if args.add:
         sys.exit("Invalid Input")
 
     note = Note(tag=args.add[0].lower(), title=args.add[1].lower(), content=args.add[2])
-    print(note.add(information))
-    save(command="add")
+    notes_manager = NotesManager()
+
+    updated_info = notes_manager.add(note, information)
+    print("Note added successfuly")
+    save(command="add", information=updated_info)
 
 elif args.search:
     validate = validation(tag=args.search[0], title=args.search[1])
@@ -37,7 +40,9 @@ elif args.search:
         sys.exit("Invalid Input")
 
     note = Note(tag=args.search[0].lower(), title=args.search[1].lower())
-    print(note.search(information))
+    notes_manager = NotesManager()
+
+    print(notes_manager.search(note, information))
     save(command="search")
 
 elif args.delete:
@@ -46,12 +51,19 @@ elif args.delete:
         sys.exit("Invalid Input")
 
     note = Note(tag=args.delete[0].lower(), title=args.delete[1].lower())
-    print(note.delete(information))
-    save(command="delete")
+    notes_manager = NotesManager()
+
+    updated_info = notes_manager.delete(note, information)
+    if not isinstance(updated_info, dict):
+        sys.exit("Invalid tag/title")
+
+    print("Note deleted successfully")
+    save(command="delete", information=updated_info)
+    
 
 elif args.view:
-    note = Note()
-    note.view(information)
+    notes_manager = NotesManager()
+    notes_manager.view(information)
     save(command="view")
 
 elif args.edit:
@@ -60,8 +72,14 @@ elif args.edit:
         sys.exit("Invalid Input")
 
     note = Note(tag=args.edit[0].lower())
-    print(note.edit_tag(information, args.edit[1]))
-    save(command="edit")
+    notes_manager = NotesManager()
+    
+    updated_info = notes_manager.edit_tag(note, information, args.edit[1])
+    if not isinstance(updated_info, dict):
+        sys.exit("Invalid tag")
 
+    save(command="edit", information=updated_info)
+    print("Tag edited successfully")
+    
 elif args.history:
     load(history=True, load_notes=False)
