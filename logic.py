@@ -1,5 +1,4 @@
 from datetime import datetime as dt
-from storage import save
 
 
 class Note:
@@ -32,10 +31,10 @@ class NotesManager:
         #Handle output for user's search
         the_tag = information.get(note.tag, {})
         if not the_tag:
-            return "Invalid tag/title"
+            return "Invalid tag"
         the_note = the_tag.get(note.title, {})
         if not the_note:
-            return "Invalid tag/title"
+            return "Invalid title"
         return f"Tag: {note.tag.title()}    Title: {note.title.title()}    Date Created: {the_note['date']}\n\nContent: \n{the_note['content']}"
     
     
@@ -68,9 +67,8 @@ class NotesManager:
     
     def edit_tag(self, note, information, new_tag):
         #Change the name of the current tag to that of new tag
-        the_tag = information.get(note.tag, {})
+        the_tag = information.pop(note.tag, {})
         if not the_tag:
             return False
-        information.pop(note.tag)
-        information.setdefault(new_tag, the_tag)
+        information[new_tag] = the_tag
         return information

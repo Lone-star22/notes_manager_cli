@@ -83,3 +83,4 @@ elif args.edit:
     
 elif args.history:
     load(history=True, load_notes=False)
+    save(command="history")
